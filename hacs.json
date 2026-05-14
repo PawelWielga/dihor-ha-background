@@ -1,7 +1,8 @@
 {
   "name": "dihor-ha-background",
   "render_readme": true,
+  "zip_release": true,
+  "filename": "dihor-ha-background.zip",
   "domains": ["dihor_background"],
   "homeassistant": "2024.1.0"
 }
-
