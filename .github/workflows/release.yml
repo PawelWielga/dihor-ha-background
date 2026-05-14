@@ -17,11 +17,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build ZIP
-        run: zip -r dihor-ha-background.zip custom_components README.md hacs.json
+        working-directory: custom_components/dihor_background
+        run: zip -r ../../dihor-ha-background.zip .
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: dihor-ha-background.zip
           generate_release_notes: true
-
