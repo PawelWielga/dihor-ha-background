@@ -28,9 +28,12 @@ Podczas dodawania integracji podajesz:
 
 - `dashboard` - identyfikator dashboardu, np. `default`, `salon`, `tablet`.
 - `source` - `static`, `api` albo `unsplash`.
-- `static_path` - sciezka do pliku w konfiguracji HA, np. `www/backgrounds/default.jpg`.
-- `api_url` - URL endpointu zwracajacego obraz.
-- `refresh_minutes` - interwal odswiezania dla zrodla `api`.
+
+Po wyborze zrodla integracja pokazuje tylko pola potrzebne dla danego typu tla:
+
+- `static_path` - dla `static`, sciezka do pliku w konfiguracji HA, np. `www/backgrounds/default.jpg`.
+- `api_url` - dla `api`, URL endpointu zwracajacego obraz.
+- `refresh_minutes` - dla `api` i `unsplash`, interwal odswiezania w minutach.
 
 ### Unsplash
 
@@ -43,7 +46,7 @@ Opcjonalnie mozna ustawic:
 - `unsplash_width` i `unsplash_height` - rozmiar obrazu.
 - `unsplash_quality` - jakosc kompresji.
 
-Wazne: Unsplash wymaga uzywania URL-i obrazow zwracanych przez API. Dlatego dla tego providera integracja zapisuje w encji URL do CDN Unsplash, zamiast kopiowac zdjecie do `/local`.
+Dla zrodla `unsplash` integracja pobiera losowe zdjecie, zapisuje je lokalnie w `www/dihor_backgrounds` i ustawia encje na staly URL `/local/dihor_backgrounds/<dashboard>.jpg`. Oryginalny URL obrazu z Unsplash jest dostepny w atrybucie `image_url`.
 
 ## Uslugi
 
@@ -67,7 +70,7 @@ Wynikowy URL:
 ### `dihor_background.refresh`
 
 Pobiera tlo z API. Jesli nie podasz `url`, integracja uzyje URL zapisanego w konfiguracji dashboardu.
-Dla zrodla `unsplash` usluga pobierze nowe losowe zdjecie z konfiguracji Unsplash.
+Dla zrodla `unsplash` usluga pobierze nowe losowe zdjecie z konfiguracji Unsplash i zapisze je pod stalym lokalnym adresem.
 
 ```yaml
 service: dihor_background.refresh
@@ -84,20 +87,38 @@ Po odswiezeniu tlo jest dostepne jako statyczny plik Home Assistant:
 /local/dihor_backgrounds/salon.jpg
 ```
 
-Ten URL mozna wykorzystac w motywie, card-mod, custom CSS albo przyszlym komponencie frontendowym.
+Ten URL trzeba jednorazowo ustawic jako tlo widoku Lovelace. Integracja odswieza plik pod tym samym adresem, dlatego pozniej nie trzeba zmieniac konfiguracji dashboardu przy kazdej zmianie obrazu.
 
-Dla zrodla `unsplash` aktualny URL obrazu znajduje sie bezposrednio w stanie encji:
+Przyklad dla widoku `salon`:
+
+```yaml
+background:
+  image: /local/dihor_backgrounds/salon.jpg
+  opacity: 100
+  size: cover
+  alignment: center
+  repeat: no-repeat
+  attachment: fixed
+```
+
+Dla dashboardu o sciezce `/lovelace/debug` i konfiguracji `dashboard: debug` uzyj:
+
+```yaml
+background:
+  image: /local/dihor_backgrounds/debug.jpg
+  opacity: 100
+  size: cover
+  alignment: center
+  repeat: no-repeat
+  attachment: fixed
+```
+
+Ten URL mozna tez wykorzystac w motywie, card-mod, custom CSS albo przyszlym komponencie frontendowym.
+
+Dla zrodla `unsplash` uzyj tego samego lokalnego URL-a:
 
 ```text
-dihor_background.salon
+/local/dihor_backgrounds/salon.jpg
 ```
 
-Encja zawiera tez atrybuty z identyfikatorem zdjecia i autorem.
-
-## Development
-
-Podstawowa walidacja skladni:
-
-```bash
-python -m py_compile custom_components/dihor_background/*.py
-```
+Encja `dihor_background.salon` wskazuje ten lokalny URL i zawiera atrybuty z identyfikatorem zdjecia, autorem, linkiem do Unsplash oraz oryginalnym `image_url`.

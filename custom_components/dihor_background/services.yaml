@@ -12,7 +12,7 @@ set_static:
       example: www/backgrounds/default.jpg
 
 refresh:
-  description: Refreshes the configured dashboard background. For Unsplash, this updates the state with a hotlinked Unsplash image URL.
+  description: Refreshes the configured dashboard background. For Unsplash, this downloads a new image and updates the local public background URL.
   fields:
     dashboard:
       required: true

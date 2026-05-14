@@ -35,31 +35,19 @@ from .const import (
 
 class DihorBackgroundConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
+    _base_data: dict[str, Any]
 
     async def async_step_user(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> config_entries.ConfigFlowResult:
-        errors: dict[str, str] = {}
-
         if user_input is not None:
             dashboard = user_input[CONF_DASHBOARD]
             await self.async_set_unique_id(dashboard)
             self._abort_if_unique_id_configured()
 
-            if user_input[CONF_SOURCE] == SOURCE_API and not user_input.get(CONF_API_URL):
-                errors[CONF_API_URL] = "required"
-            elif user_input[CONF_SOURCE] == SOURCE_STATIC and not user_input.get(CONF_STATIC_PATH):
-                errors[CONF_STATIC_PATH] = "required"
-            elif user_input[CONF_SOURCE] == SOURCE_UNSPLASH and not user_input.get(
-                CONF_UNSPLASH_ACCESS_KEY
-            ):
-                errors[CONF_UNSPLASH_ACCESS_KEY] = "required"
-            else:
-                return self.async_create_entry(
-                    title=f"Dihor Background: {dashboard}",
-                    data=user_input,
-                )
+            self._base_data = user_input
+            return await self.async_step_source()
 
         return self.async_show_form(
             step_id="user",
@@ -69,9 +57,69 @@ class DihorBackgroundConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_SOURCE, default=SOURCE_STATIC): vol.In(
                         [SOURCE_STATIC, SOURCE_API, SOURCE_UNSPLASH]
                     ),
-                    vol.Optional(CONF_STATIC_PATH): str,
-                    vol.Optional(CONF_API_URL): str,
-                    vol.Optional(CONF_UNSPLASH_ACCESS_KEY): str,
+                }
+            ),
+        )
+
+    async def async_step_source(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        source = self._base_data[CONF_SOURCE]
+        if source == SOURCE_STATIC:
+            return await self.async_step_static(user_input)
+        if source == SOURCE_API:
+            return await self.async_step_api(user_input)
+        return await self.async_step_unsplash(user_input)
+
+    async def async_step_static(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input is not None:
+            return self._async_create_background_entry(user_input)
+
+        return self.async_show_form(
+            step_id="static",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_STATIC_PATH): str,
+                }
+            ),
+        )
+
+    async def async_step_api(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input is not None:
+            return self._async_create_background_entry(user_input)
+
+        return self.async_show_form(
+            step_id="api",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_API_URL): str,
+                    vol.Optional(
+                        CONF_REFRESH_MINUTES,
+                        default=DEFAULT_REFRESH_MINUTES,
+                    ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
+                }
+            ),
+        )
+
+    async def async_step_unsplash(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input is not None:
+            return self._async_create_background_entry(user_input)
+
+        return self.async_show_form(
+            step_id="unsplash",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_UNSPLASH_ACCESS_KEY): str,
                     vol.Optional(CONF_UNSPLASH_QUERY): str,
                     vol.Optional(
                         CONF_UNSPLASH_ORIENTATION,
@@ -99,5 +147,14 @@ class DihorBackgroundConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
                 }
             ),
-            errors=errors,
+        )
+
+    def _async_create_background_entry(
+        self,
+        source_data: dict[str, Any],
+    ) -> config_entries.ConfigFlowResult:
+        data = {**self._base_data, **source_data}
+        return self.async_create_entry(
+            title=f"Dihor Background: {data[CONF_DASHBOARD]}",
+            data=data,
         )

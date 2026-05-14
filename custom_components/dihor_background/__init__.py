@@ -268,21 +268,29 @@ async def async_refresh_unsplash_background(
         },
     )
 
+    async with session.get(image_url) as response:
+        response.raise_for_status()
+        content = await response.read()
+
+    target = _background_path(hass, dashboard)
+    await hass.async_add_executor_job(target.write_bytes, content)
+
     user = photo.get("user") or {}
     links = photo.get("links") or {}
     _set_background_state(
         hass,
         dashboard,
-        image_url,
+        _public_url(dashboard),
         SOURCE_UNSPLASH,
         {
             "photo_id": photo.get("id"),
             "photographer": user.get("name"),
             "photographer_url": (user.get("links") or {}).get("html"),
             "unsplash_url": links.get("html"),
+            "image_url": image_url,
         },
     )
-    return image_url
+    return _public_url(dashboard)
 
 
 def _with_image_params(url: str, params: dict[str, str | int]) -> str:
