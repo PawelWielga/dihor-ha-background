@@ -1,0 +1,7 @@
+{
+  "name": "dihor-ha-background",
+  "render_readme": true,
+  "domains": ["dihor_background"],
+  "homeassistant": "2024.1.0"
+}
+

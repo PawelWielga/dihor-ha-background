@@ -1,0 +1,26 @@
+set_static:
+  fields:
+    dashboard:
+      required: true
+      selector:
+        text:
+      example: default
+    static_path:
+      required: true
+      selector:
+        text:
+      example: www/backgrounds/default.jpg
+
+refresh:
+  description: Refreshes the configured dashboard background. For Unsplash, this updates the state with a hotlinked Unsplash image URL.
+  fields:
+    dashboard:
+      required: true
+      selector:
+        text:
+      example: default
+    url:
+      required: false
+      selector:
+        text:
+      example: https://example.com/background.jpg

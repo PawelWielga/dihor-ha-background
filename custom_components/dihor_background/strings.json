@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Dihor Dashboard Background",
+        "description": "Configure a dashboard background from a static file or an API image URL.",
+        "data": {
+          "dashboard": "Dashboard",
+          "source": "Source",
+          "static_path": "Static file path",
+          "api_url": "API image URL",
+          "refresh_minutes": "Refresh interval in minutes",
+          "unsplash_access_key": "Unsplash access key",
+          "unsplash_query": "Unsplash search query",
+          "unsplash_orientation": "Unsplash orientation",
+          "unsplash_content_filter": "Unsplash content filter",
+          "unsplash_width": "Unsplash image width",
+          "unsplash_height": "Unsplash image height",
+          "unsplash_quality": "Unsplash image quality"
+        }
+      }
+    },
+    "error": {
+      "required": "This field is required."
+    },
+    "abort": {
+      "already_configured": "This dashboard is already configured."
+    }
+  }
+}
