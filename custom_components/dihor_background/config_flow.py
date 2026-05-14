@@ -5,7 +5,6 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.helpers import config_validation as cv
 
 from .const import (
     CONF_API_URL,
@@ -71,7 +70,7 @@ class DihorBackgroundConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         [SOURCE_STATIC, SOURCE_API, SOURCE_UNSPLASH]
                     ),
                     vol.Optional(CONF_STATIC_PATH): str,
-                    vol.Optional(CONF_API_URL): cv.url,
+                    vol.Optional(CONF_API_URL): str,
                     vol.Optional(CONF_UNSPLASH_ACCESS_KEY): str,
                     vol.Optional(CONF_UNSPLASH_QUERY): str,
                     vol.Optional(
