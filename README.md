@@ -20,7 +20,7 @@ Integracja ma ulatwic podmiane tel dla dashboardow Home Assistant. Dziala po str
 5. Dodaj integracje z poziomu `Settings -> Devices & services`.
 
 Jesli po instalacji integracja nie pojawia sie w wyszukiwarce `Devices & services`, upewnij sie, ze masz wersje `v0.1.2` albo nowsza. Wczesniejsza paczka release miala niepoprawna strukture ZIP dla HACS.
-Jesli integracja pojawia sie, ale formularz konfiguracji zwraca blad 500, zaktualizuj do `v0.1.3` albo nowszej.
+Jesli integracja pojawia sie, ale formularz konfiguracji zwraca blad 500, zaktualizuj do `v0.1.4` albo nowszej.
 
 ## Konfiguracja
 

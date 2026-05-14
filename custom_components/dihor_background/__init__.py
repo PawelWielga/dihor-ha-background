@@ -46,6 +46,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = []
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 SERVICE_SET_STATIC = "set_static"
 SERVICE_REFRESH = "refresh"
