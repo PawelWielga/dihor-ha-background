@@ -91,7 +91,8 @@ data:
 
 ## Reczne odswiezanie
 
-Dla kazdego wpisu integracji tworzona jest encja przycisku:
+Dla kazdego wpisu integracji tworzona jest encja przycisku. W selektorze encji
+Home Assistant przycisk ma nazwe z dashboardem, np. `Refresh background: salon`.
 
 ```text
 button.dihor_background_<dashboard>_refresh_background
