@@ -45,7 +45,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = []
+PLATFORMS: list[Platform] = [Platform.BUTTON]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 SERVICE_SET_STATIC = "set_static"
@@ -74,15 +74,18 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
-    dashboard = entry.data.get(CONF_DASHBOARD, DEFAULT_DASHBOARD)
+    config = _entry_config(entry)
+    dashboard = config.get(CONF_DASHBOARD, DEFAULT_DASHBOARD)
     hass.data[DOMAIN][entry.entry_id] = entry
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    source = entry.data.get(CONF_SOURCE)
-    if source == SOURCE_STATIC and entry.data.get(CONF_STATIC_PATH):
-        await async_set_static_background(hass, dashboard, entry.data[CONF_STATIC_PATH])
+    source = config.get(CONF_SOURCE)
+    if source == SOURCE_STATIC and config.get(CONF_STATIC_PATH):
+        await async_set_static_background(hass, dashboard, config[CONF_STATIC_PATH])
 
     if source in (SOURCE_API, SOURCE_UNSPLASH):
-        minutes = entry.data.get(CONF_REFRESH_MINUTES, DEFAULT_REFRESH_MINUTES)
+        minutes = config.get(CONF_REFRESH_MINUTES, DEFAULT_REFRESH_MINUTES)
 
         async def _refresh_interval(now) -> None:  # noqa: ANN001
             await async_refresh_entry_background(hass, entry)
@@ -99,8 +102,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hass.data[DOMAIN].pop(entry.entry_id, None)
-    return True
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+    return unload_ok
+
+
+async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def _async_register_services(hass: HomeAssistant) -> None:
@@ -155,6 +164,10 @@ def _find_entry(hass: HomeAssistant, dashboard: str) -> ConfigEntry | None:
     return None
 
 
+def _entry_config(entry: ConfigEntry) -> dict:
+    return {**entry.data, **entry.options}
+
+
 def _set_background_state(
     hass: HomeAssistant,
     dashboard: str,
@@ -169,15 +182,16 @@ def _set_background_state(
 
 
 async def async_refresh_entry_background(hass: HomeAssistant, entry: ConfigEntry) -> str:
-    dashboard = entry.data.get(CONF_DASHBOARD, DEFAULT_DASHBOARD)
-    source = entry.data.get(CONF_SOURCE)
+    config = _entry_config(entry)
+    dashboard = config.get(CONF_DASHBOARD, DEFAULT_DASHBOARD)
+    source = config.get(CONF_SOURCE)
 
     if source == SOURCE_API:
-        return await async_refresh_background(hass, dashboard, entry.data.get(CONF_API_URL))
+        return await async_refresh_background(hass, dashboard, config.get(CONF_API_URL))
     if source == SOURCE_UNSPLASH:
-        return await async_refresh_unsplash_background(hass, dashboard, entry.data)
+        return await async_refresh_unsplash_background(hass, dashboard, config)
     if source == SOURCE_STATIC:
-        return await async_set_static_background(hass, dashboard, entry.data[CONF_STATIC_PATH])
+        return await async_set_static_background(hass, dashboard, config[CONF_STATIC_PATH])
 
     raise ValueError(f"Unsupported background source: {source}")
 

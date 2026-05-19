@@ -35,6 +35,16 @@ Po wyborze zrodla integracja pokazuje tylko pola potrzebne dla danego typu tla:
 - `api_url` - dla `api`, URL endpointu zwracajacego obraz.
 - `refresh_minutes` - dla `api` i `unsplash`, interwal odswiezania w minutach.
 
+### Edycja konfiguracji
+
+Po dodaniu integracji mozesz zmienic zrodlo tla, URL API, sciezke pliku statycznego, ustawienia Unsplash i interwal odswiezania z poziomu wpisu integracji:
+
+1. Wejdz w `Settings -> Devices & services`.
+2. Otworz `Dihor Dashboard Background`.
+3. Przy wybranym wpisie kliknij `Configure`.
+
+Po zapisaniu opcji integracja przeladowuje wpis i od razu uzywa nowych ustawien. Identyfikator `dashboard` pozostaje staly dla danego wpisu.
+
 ### Unsplash
 
 Dla zrodla `unsplash` wymagany jest `unsplash_access_key` z aplikacji utworzonej w Unsplash Developers.
@@ -77,6 +87,36 @@ service: dihor_background.refresh
 data:
   dashboard: salon
   url: https://example.com/background.jpg
+```
+
+## Reczne odswiezanie
+
+Dla kazdego wpisu integracji tworzona jest encja przycisku:
+
+```text
+button.dihor_background_<dashboard>_refresh_background
+```
+
+Przyklad dla dashboardu `salon`:
+
+```yaml
+type: button
+entity: button.dihor_background_salon_refresh_background
+name: Nowe tlo
+icon: mdi:image-refresh
+```
+
+Mozesz tez podpiac bezposrednio usluge pod dowolny przycisk Lovelace:
+
+```yaml
+type: button
+name: Nowe tlo
+icon: mdi:image-refresh
+tap_action:
+  action: call-service
+  service: dihor_background.refresh
+  data:
+    dashboard: salon
 ```
 
 ## Uzycie w dashboardzie

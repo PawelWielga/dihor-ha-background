@@ -45,5 +45,45 @@
     "abort": {
       "already_configured": "This dashboard is already configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Dihor Dashboard Background options",
+        "description": "Choose the background source for this dashboard.",
+        "data": {
+          "source": "Background source"
+        }
+      },
+      "static": {
+        "title": "Static file background",
+        "description": "Use an existing image file from your Home Assistant configuration directory.",
+        "data": {
+          "static_path": "Static file path"
+        }
+      },
+      "api": {
+        "title": "API background",
+        "description": "Download the background from an image URL and refresh it on a schedule.",
+        "data": {
+          "api_url": "API image URL",
+          "refresh_minutes": "Refresh interval in minutes"
+        }
+      },
+      "unsplash": {
+        "title": "Unsplash background",
+        "description": "Download a random Unsplash image and expose it through a stable local URL.",
+        "data": {
+          "unsplash_access_key": "Unsplash access key",
+          "unsplash_query": "Unsplash search query",
+          "unsplash_orientation": "Unsplash orientation",
+          "unsplash_content_filter": "Unsplash content filter",
+          "unsplash_width": "Unsplash image width",
+          "unsplash_height": "Unsplash image height",
+          "unsplash_quality": "Unsplash image quality",
+          "refresh_minutes": "Refresh interval in minutes"
+        }
+      }
+    }
   }
 }
